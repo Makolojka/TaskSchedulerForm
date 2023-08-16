@@ -18,6 +18,7 @@ namespace TaskSchedulerForm
 
         private string selectedFolderPath = "C:\\Program Files\\HarmonogramMK";
         private bool isAppStartChecked = true;
+        int Top = 50;
         public string SelectedFolderPath
         {
             get { return selectedFolderPath; }
@@ -42,14 +43,11 @@ namespace TaskSchedulerForm
             {
                 cmbMinutes.Items.Add(i);
             }
-            LoadTaskData();
+
             LoadConfiguration();
+            LoadTaskData();
 
         }
-
-        int Top = 50;
-        //private List<TaskControls> taskControlsList = new List<TaskControls>();
-        //private NotifyIcon notifyIcon;
 
         //Validates field and adds new task
         private void button1_Click(object sender, EventArgs e)
@@ -166,6 +164,7 @@ namespace TaskSchedulerForm
             Top += 60;
         }
 
+        //Cancel or remove given task
         private void btnDynamicTask_Click(object sender, EventArgs e)
         {
             Button clickedButton = (Button)sender;
@@ -185,7 +184,7 @@ namespace TaskSchedulerForm
         }
 
 
-
+        //Executes when timer elapse
         private void TaskTimer_Elapsed(TaskControls taskControls, object sender, System.Timers.ElapsedEventArgs e)
         {
             DateTime currentTime = DateTime.Now;
@@ -222,6 +221,7 @@ namespace TaskSchedulerForm
             }
         }
 
+        //Date parser
         private DateTime GetScheduledTimeFromLabelText(string labelText)
         {
             int startIndex = labelText.IndexOf("uruchomi siê: ") + "uruchomi siê: ".Length;
@@ -257,19 +257,22 @@ namespace TaskSchedulerForm
         // Save task data to a JSON file
         private void SaveTaskData()
         {
+            
             List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
             string json = JsonSerializer.Serialize(taskInfos, new JsonSerializerOptions
             {
                 WriteIndented = true
             });
-            string jsonFilePath = @"C:\Ico\taskData.json";
+            string jsonFileName = "taskData.json";
+            string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
             File.WriteAllText(jsonFilePath, json);
         }
 
         // Load task data from a JSON file
         private void LoadTaskData()
         {
-            string jsonFilePath = @"C:\Ico\taskData.json";
+            string jsonFileName = "taskData.json";
+            string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
             if (File.Exists(jsonFilePath))
             {
                 string json = File.ReadAllText(jsonFilePath);
@@ -286,6 +289,7 @@ namespace TaskSchedulerForm
             }
         }
 
+        //Loads users configuration/preferences
         private void LoadConfiguration()
         {
             try
@@ -313,114 +317,31 @@ namespace TaskSchedulerForm
 
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox3_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void activeTasks_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtEventName_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnDeleteTask_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripMenuItem2_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        //Shows settings form
         private void accessibilityBtn_Click(object sender, EventArgs e)
         {
             AccessibilityForm accessibilityForm = new AccessibilityForm(this);
             accessibilityForm.ShowDialog();
         }
-    }
 
-    public class TaskControls
-    {
-        public Label Label { get; set; }
-        public Button Button { get; set; }
+        //Allows user to choose folder and exe files
+        private void changePathBtn_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Executable Files (*.exe)|*.exe|All Files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.CheckFileExists = true;
+                openFileDialog.Multiselect = false;
 
-        public System.Timers.Timer Timer { get; set; }
-
-        public string TargetPath { get; set; }
-        public TaskInfo TaskInfo { get; set; }
-    }
-
-    public class TaskInfo
-    {
-        public string EventName { get; set; }
-        public string TargetApplication { get; set; }
-        public DateTime TargetDateTime { get; set; }
+                DialogResult result = openFileDialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    string selectedFilePath = openFileDialog.FileName;
+                    txtTargetApplication.Text = selectedFilePath;
+                }
+            }
+        }
     }
 }

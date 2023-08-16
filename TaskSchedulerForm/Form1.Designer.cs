@@ -35,6 +35,7 @@ namespace TaskSchedulerForm
             btnSchedule = new Button();
             label1 = new Label();
             eventCreatorGroup = new GroupBox();
+            changePathBtn = new Button();
             dotSeparator = new Label();
             cmbMinutes = new ComboBox();
             label5 = new Label();
@@ -50,6 +51,7 @@ namespace TaskSchedulerForm
             notifyIcon1 = new NotifyIcon(components);
             panel1 = new Panel();
             accessibilityBtn = new Button();
+            label6 = new Label();
             eventCreatorGroup.SuspendLayout();
             activeTasks.SuspendLayout();
             panel1.SuspendLayout();
@@ -80,10 +82,10 @@ namespace TaskSchedulerForm
             label1.Size = new Size(181, 28);
             label1.TabIndex = 1;
             label1.Text = "Ścieżka do aplikacji";
-            label1.Click += label1_Click;
             // 
             // eventCreatorGroup
             // 
+            eventCreatorGroup.Controls.Add(changePathBtn);
             eventCreatorGroup.Controls.Add(dotSeparator);
             eventCreatorGroup.Controls.Add(cmbMinutes);
             eventCreatorGroup.Controls.Add(label5);
@@ -103,7 +105,22 @@ namespace TaskSchedulerForm
             eventCreatorGroup.TabIndex = 2;
             eventCreatorGroup.TabStop = false;
             eventCreatorGroup.Text = "Utwórz zadanie";
-            eventCreatorGroup.Enter += groupBox1_Enter;
+            // 
+            // changePathBtn
+            // 
+            changePathBtn.BackColor = Color.FromArgb(231, 76, 60);
+            changePathBtn.FlatAppearance.BorderSize = 0;
+            changePathBtn.FlatStyle = FlatStyle.Flat;
+            changePathBtn.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
+            changePathBtn.ForeColor = Color.White;
+            changePathBtn.Location = new Point(394, 180);
+            changePathBtn.Margin = new Padding(4);
+            changePathBtn.Name = "changePathBtn";
+            changePathBtn.Size = new Size(75, 34);
+            changePathBtn.TabIndex = 11;
+            changePathBtn.Text = "Wybierz";
+            changePathBtn.UseVisualStyleBackColor = false;
+            changePathBtn.Click += changePathBtn_Click;
             // 
             // dotSeparator
             // 
@@ -112,7 +129,6 @@ namespace TaskSchedulerForm
             dotSeparator.Size = new Size(16, 36);
             dotSeparator.TabIndex = 9;
             dotSeparator.Text = ":";
-            dotSeparator.Click += label6_Click_1;
             // 
             // cmbMinutes
             // 
@@ -132,7 +148,6 @@ namespace TaskSchedulerForm
             label5.Size = new Size(154, 28);
             label5.TabIndex = 7;
             label5.Text = "Godzina/minuty";
-            label5.Click += label5_Click;
             // 
             // cmbHours
             // 
@@ -142,7 +157,6 @@ namespace TaskSchedulerForm
             cmbHours.Name = "cmbHours";
             cmbHours.Size = new Size(60, 36);
             cmbHours.TabIndex = 5;
-            cmbHours.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // dateTimePicker
             // 
@@ -169,20 +183,19 @@ namespace TaskSchedulerForm
             txtTargetApplication.Location = new Point(23, 180);
             txtTargetApplication.Margin = new Padding(4);
             txtTargetApplication.Name = "txtTargetApplication";
-            txtTargetApplication.Size = new Size(446, 34);
+            txtTargetApplication.Size = new Size(363, 34);
             txtTargetApplication.TabIndex = 3;
-            txtTargetApplication.TextChanged += textBox2_TextChanged;
             // 
             // txtEventName
             // 
             txtEventName.BackColor = SystemColors.Window;
+            txtEventName.ForeColor = SystemColors.WindowText;
             txtEventName.Location = new Point(23, 80);
             txtEventName.Margin = new Padding(4);
             txtEventName.MaxLength = 14;
             txtEventName.Name = "txtEventName";
             txtEventName.Size = new Size(446, 34);
             txtEventName.TabIndex = 2;
-            txtEventName.TextChanged += txtEventName_TextChanged;
             // 
             // label2
             // 
@@ -193,7 +206,6 @@ namespace TaskSchedulerForm
             label2.Size = new Size(142, 28);
             label2.TabIndex = 0;
             label2.Text = "Nazwa zadania";
-            label2.Click += label2_Click;
             // 
             // label4
             // 
@@ -205,7 +217,6 @@ namespace TaskSchedulerForm
             label4.Size = new Size(161, 32);
             label4.TabIndex = 3;
             label4.Text = "Kreator zadań";
-            label4.Click += label4_Click;
             // 
             // activeTasks
             // 
@@ -219,7 +230,6 @@ namespace TaskSchedulerForm
             activeTasks.TabIndex = 4;
             activeTasks.TabStop = false;
             activeTasks.Text = "Aktywne zadania";
-            activeTasks.Enter += activeTasks_Enter;
             // 
             // activeTasksPanel
             // 
@@ -264,12 +274,24 @@ namespace TaskSchedulerForm
             accessibilityBtn.UseVisualStyleBackColor = false;
             accessibilityBtn.Click += accessibilityBtn_Click;
             // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Point);
+            label6.Location = new Point(565, 58);
+            label6.Margin = new Padding(4, 0, 4, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(170, 32);
+            label6.TabIndex = 6;
+            label6.Text = "Podgląd zadań";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(11F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1382, 703);
+            Controls.Add(label6);
             Controls.Add(panel1);
             Controls.Add(activeTasks);
             Controls.Add(label4);
@@ -281,7 +303,6 @@ namespace TaskSchedulerForm
             MaximumSize = new Size(1400, 750);
             Name = "Form1";
             Text = "Harmonogram zadań";
-            Load += Form1_Load;
             SizeChanged += Form1_SizeChanged;
             eventCreatorGroup.ResumeLayout(false);
             eventCreatorGroup.PerformLayout();
@@ -312,5 +333,7 @@ namespace TaskSchedulerForm
 
         private Panel panel1;
         private Button accessibilityBtn;
+        private Button changePathBtn;
+        private Label label6;
     }
 }

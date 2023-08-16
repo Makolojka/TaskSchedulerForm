@@ -55,7 +55,7 @@
             // 
             label2.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
             label2.ForeColor = SystemColors.Desktop;
-            label2.Location = new Point(12, 32);
+            label2.Location = new Point(29, 32);
             label2.Name = "label2";
             label2.Size = new Size(432, 35);
             label2.TabIndex = 1;
@@ -75,7 +75,7 @@
             // 
             label3.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
             label3.ForeColor = SystemColors.Desktop;
-            label3.Location = new Point(12, 110);
+            label3.Location = new Point(29, 118);
             label3.Name = "label3";
             label3.Size = new Size(432, 35);
             label3.TabIndex = 3;
@@ -84,9 +84,9 @@
             // textBox1
             // 
             textBox1.BorderStyle = BorderStyle.FixedSingle;
-            textBox1.Location = new Point(15, 60);
+            textBox1.Location = new Point(32, 70);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(429, 27);
+            textBox1.Size = new Size(391, 27);
             textBox1.TabIndex = 4;
             textBox1.TextChanged += textBox1_TextChanged;
             // 
@@ -118,9 +118,9 @@
             // 
             panel1.Controls.Add(radioButton1);
             panel1.Controls.Add(radioButton2);
-            panel1.Location = new Point(15, 148);
+            panel1.Location = new Point(32, 156);
             panel1.Name = "panel1";
-            panel1.Size = new Size(507, 69);
+            panel1.Size = new Size(473, 69);
             panel1.TabIndex = 8;
             // 
             // btnApply
@@ -130,7 +130,7 @@
             btnApply.FlatStyle = FlatStyle.Flat;
             btnApply.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
             btnApply.ForeColor = Color.White;
-            btnApply.Location = new Point(170, 495);
+            btnApply.Location = new Point(171, 495);
             btnApply.Margin = new Padding(4);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(178, 41);
@@ -146,7 +146,7 @@
             changePathBtn.FlatStyle = FlatStyle.Flat;
             changePathBtn.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
             changePathBtn.ForeColor = Color.White;
-            changePathBtn.Location = new Point(446, 60);
+            changePathBtn.Location = new Point(430, 70);
             changePathBtn.Margin = new Padding(4);
             changePathBtn.Name = "changePathBtn";
             changePathBtn.Size = new Size(75, 27);
@@ -171,7 +171,9 @@
             Controls.Add(flowLayoutPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
+            MaximumSize = new Size(552, 600);
             MinimizeBox = false;
+            MinimumSize = new Size(552, 600);
             Name = "AccessibilityForm";
             Text = "Ustawienia";
             Load += AccessibilityForm_Load;
