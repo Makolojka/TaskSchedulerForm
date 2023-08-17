@@ -8,11 +8,12 @@ namespace TaskSchedulerForm
 {
     internal class FolderUtils
     {
+        // TODO: zmienić sposóp sprawdzania posiadanych przez użytkownika uprawnień
         public static bool CanAccessFolder(string folderPath)
         {
             try
             {
-                // Attempt to create a dummy file in the folder
+                // Tworzy pusty plik i go usuwa
                 string testFilePath = Path.Combine(folderPath, "test.txt");
                 File.WriteAllText(testFilePath, "test");
                 File.Delete(testFilePath);

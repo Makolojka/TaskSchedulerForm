@@ -51,11 +51,7 @@ namespace TaskSchedulerForm
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
+        // Umożliwia wybór folderu
         private void changePathBtn_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -82,6 +78,7 @@ namespace TaskSchedulerForm
             this.Close();
         }
 
+        // Zapisuje konfigurację użytkownika
         private void SaveConfiguration()
         {
             try
@@ -116,6 +113,15 @@ namespace TaskSchedulerForm
                 });
 
                 File.WriteAllText(configFilePath, json);
+
+                if (isAppStartChecked)
+                {
+                    StartupManager.CreateShortcutInStartup();
+                }
+                else
+                {
+                    StartupManager.RemoveShortcutFromStartup();
+                }
             }
             catch (Exception ex)
             {
