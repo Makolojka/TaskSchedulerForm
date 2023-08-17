@@ -59,7 +59,7 @@ namespace TaskSchedulerForm
             // 
             // btnSchedule
             // 
-            btnSchedule.BackColor = Color.FromArgb(231, 76, 60);
+            btnSchedule.BackColor = Color.FromArgb(241, 100, 0);
             btnSchedule.FlatAppearance.BorderSize = 0;
             btnSchedule.FlatStyle = FlatStyle.Flat;
             btnSchedule.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
@@ -108,7 +108,7 @@ namespace TaskSchedulerForm
             // 
             // changePathBtn
             // 
-            changePathBtn.BackColor = Color.FromArgb(231, 76, 60);
+            changePathBtn.BackColor = Color.FromArgb(241, 100, 0);
             changePathBtn.FlatAppearance.BorderSize = 0;
             changePathBtn.FlatStyle = FlatStyle.Flat;
             changePathBtn.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
@@ -250,7 +250,7 @@ namespace TaskSchedulerForm
             // 
             // panel1
             // 
-            panel1.BackColor = Color.FromArgb(231, 76, 60);
+            panel1.BackColor = Color.FromArgb(241, 100, 0);
             panel1.Controls.Add(accessibilityBtn);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
@@ -260,7 +260,7 @@ namespace TaskSchedulerForm
             // 
             // accessibilityBtn
             // 
-            accessibilityBtn.BackColor = Color.FromArgb(231, 76, 60);
+            accessibilityBtn.BackColor = Color.FromArgb(241, 100, 0);
             accessibilityBtn.FlatAppearance.BorderSize = 0;
             accessibilityBtn.FlatStyle = FlatStyle.Flat;
             accessibilityBtn.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);

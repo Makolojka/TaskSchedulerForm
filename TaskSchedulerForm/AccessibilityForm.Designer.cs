@@ -44,7 +44,7 @@
             // 
             // flowLayoutPanel1
             // 
-            flowLayoutPanel1.BackColor = Color.FromArgb(231, 76, 60);
+            flowLayoutPanel1.BackColor = Color.FromArgb(241, 100, 0);
             flowLayoutPanel1.Dock = DockStyle.Top;
             flowLayoutPanel1.Location = new Point(0, 0);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
@@ -60,11 +60,10 @@
             label2.Size = new Size(432, 35);
             label2.TabIndex = 1;
             label2.Text = "Folder zapisu zadań";
-            label2.Click += label2_Click;
             // 
             // flowLayoutPanel2
             // 
-            flowLayoutPanel2.BackColor = Color.FromArgb(231, 76, 60);
+            flowLayoutPanel2.BackColor = Color.FromArgb(241, 100, 0);
             flowLayoutPanel2.Dock = DockStyle.Bottom;
             flowLayoutPanel2.Location = new Point(0, 543);
             flowLayoutPanel2.Name = "flowLayoutPanel2";
@@ -88,7 +87,6 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(391, 27);
             textBox1.TabIndex = 4;
-            textBox1.TextChanged += textBox1_TextChanged;
             // 
             // radioButton1
             // 
@@ -125,12 +123,12 @@
             // 
             // btnApply
             // 
-            btnApply.BackColor = Color.FromArgb(231, 76, 60);
+            btnApply.BackColor = Color.FromArgb(241, 100, 0);
             btnApply.FlatAppearance.BorderSize = 0;
             btnApply.FlatStyle = FlatStyle.Flat;
             btnApply.Font = new Font("Segoe UI", 10F, FontStyle.Bold, GraphicsUnit.Point);
             btnApply.ForeColor = Color.White;
-            btnApply.Location = new Point(171, 495);
+            btnApply.Location = new Point(170, 495);
             btnApply.Margin = new Padding(4);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(178, 41);
@@ -141,7 +139,7 @@
             // 
             // changePathBtn
             // 
-            changePathBtn.BackColor = Color.FromArgb(231, 76, 60);
+            changePathBtn.BackColor = Color.FromArgb(241, 100, 0);
             changePathBtn.FlatAppearance.BorderSize = 0;
             changePathBtn.FlatStyle = FlatStyle.Flat;
             changePathBtn.Font = new Font("Segoe UI", 8F, FontStyle.Bold, GraphicsUnit.Point);
@@ -176,7 +174,6 @@
             MinimumSize = new Size(552, 600);
             Name = "AccessibilityForm";
             Text = "Ustawienia";
-            Load += AccessibilityForm_Load;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ResumeLayout(false);

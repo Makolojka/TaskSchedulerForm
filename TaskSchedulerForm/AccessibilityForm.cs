@@ -36,26 +36,6 @@ namespace TaskSchedulerForm
             }
         }
 
-        private void AccessibilityForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButton1.Checked)
@@ -71,11 +51,7 @@ namespace TaskSchedulerForm
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
+        // Umożliwia wybór folderu
         private void changePathBtn_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -84,7 +60,14 @@ namespace TaskSchedulerForm
                 if (result == DialogResult.OK)
                 {
                     string selectedFolder = folderBrowserDialog.SelectedPath;
-                    textBox1.Text = selectedFolder;
+                    if (FolderUtils.CanAccessFolder(selectedFolder))
+                    {
+                        textBox1.Text = selectedFolder;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Brak uprawnień do zapisu w tym folderze.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
@@ -95,6 +78,7 @@ namespace TaskSchedulerForm
             this.Close();
         }
 
+        // Zapisuje konfigurację użytkownika
         private void SaveConfiguration()
         {
             try
@@ -115,8 +99,7 @@ namespace TaskSchedulerForm
                     IsAppStartChecked = isAppStartChecked
                 };
 
-                string Location = @"C:\Program Files";
-                string appDataFolder = Path.Combine(Location, "HarmonogramMK");
+                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
                 string configFilePath = Path.Combine(appDataFolder, "config.json");
 
                 if (!Directory.Exists(appDataFolder))
@@ -130,6 +113,15 @@ namespace TaskSchedulerForm
                 });
 
                 File.WriteAllText(configFilePath, json);
+
+                if (isAppStartChecked)
+                {
+                    StartupManager.CreateShortcutInStartup();
+                }
+                else
+                {
+                    StartupManager.RemoveShortcutFromStartup();
+                }
             }
             catch (Exception ex)
             {
