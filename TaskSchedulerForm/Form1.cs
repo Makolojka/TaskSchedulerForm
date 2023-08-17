@@ -15,8 +15,8 @@ namespace TaskSchedulerForm
     public partial class Form1 : Form
     {
         private static List<TaskControls> taskControlsList = new List<TaskControls>();
+        private string selectedFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
 
-        private string selectedFolderPath = "C:\\Program Files\\HarmonogramMK";
         private bool isAppStartChecked = true;
         int Top = 50;
         public string SelectedFolderPath
@@ -84,84 +84,99 @@ namespace TaskSchedulerForm
                 return;
             }
 
+            // Check if the selectedFolderPath is accessible
+            if (!FolderUtils.CanAccessFolder(selectedFolderPath))
+            {
+                MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             AddTask(eventName, targetApplication, targetDateTime, false);
         }
 
         //Adds new task to the tasks list
         private void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed)
         {
-            Label lblDynamic = new Label();
-            lblDynamic.BackColor = Color.FromArgb(240, 240, 240);
-            //lblDynamic.ForeColor = Color.FromArgb(51, 51, 51);
-            lblDynamic.Padding = new Padding(10, 5, 10, 5);
-            lblDynamic.Margin = new Padding(5, 10, 5, 10);
-            lblDynamic.MinimumSize = new Size(650, 45);
-            lblDynamic.MaximumSize = new Size(650, 45);
-            lblDynamic.AutoSize = true;
-            //lblDynamic.Text = "Zadanie: " + eventName + " uruchomi siê:  " + targetDateTime.ToString();
-
-            Button btnDynamic = new Button();
-            btnDynamic.Size = new Size(100, 45);
-            btnDynamic.Margin = new Padding(5, 10, 5, 10);
-            btnDynamic.BackColor = Color.FromArgb(231, 76, 60);
-            btnDynamic.ForeColor = Color.White;
-            btnDynamic.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            //btnDynamic.Text = "Anuluj";
-            btnDynamic.FlatStyle = FlatStyle.Flat;
-            btnDynamic.FlatAppearance.BorderSize = 0;
-            btnDynamic.TextAlign = ContentAlignment.MiddleCenter;
-            btnDynamic.Click += btnDynamicTask_Click;
-
-            if (eventHasPassed)
+            try
             {
-                lblDynamic.ForeColor = Color.Gray;
-                lblDynamic.Text = $"Zadanie: {eventName} nie uruchomi³o siê: {targetDateTime.ToString()}";
-                btnDynamic.Text = "Usuñ";
+                Label lblDynamic = new Label();
+                lblDynamic.BackColor = Color.FromArgb(240, 240, 240);
+                //lblDynamic.ForeColor = Color.FromArgb(51, 51, 51);
+                lblDynamic.Padding = new Padding(10, 5, 10, 5);
+                lblDynamic.Margin = new Padding(5, 10, 5, 10);
+                lblDynamic.MinimumSize = new Size(650, 45);
+                lblDynamic.MaximumSize = new Size(650, 45);
+                lblDynamic.AutoSize = true;
+                //lblDynamic.Text = "Zadanie: " + eventName + " uruchomi siê:  " + targetDateTime.ToString();
 
-            }
-            else
-            {
-                lblDynamic.ForeColor = Color.FromArgb(51, 51, 51);
-                lblDynamic.Text = $"Zadanie: {eventName} uruchomi siê: {targetDateTime.ToString()}";
-                btnDynamic.Text = "Anuluj";
-            }
+                Button btnDynamic = new Button();
+                btnDynamic.Size = new Size(100, 45);
+                btnDynamic.Margin = new Padding(5, 10, 5, 10);
+                btnDynamic.BackColor = Color.FromArgb(231, 76, 60);
+                btnDynamic.ForeColor = Color.White;
+                btnDynamic.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+                //btnDynamic.Text = "Anuluj";
+                btnDynamic.FlatStyle = FlatStyle.Flat;
+                btnDynamic.FlatAppearance.BorderSize = 0;
+                btnDynamic.TextAlign = ContentAlignment.MiddleCenter;
+                btnDynamic.Click += btnDynamicTask_Click;
 
-            TaskInfo taskInfo = new TaskInfo
-            {
-                EventName = eventName,
-                TargetApplication = targetApplication,
-                TargetDateTime = targetDateTime
-            };
-
-            TaskControls taskControls = new TaskControls
-            {
-                Label = lblDynamic,
-                Button = btnDynamic,
-                Timer = new System.Timers.Timer()
+                if (eventHasPassed)
                 {
-                    Interval = 5000,
-                },
-                TargetPath = targetApplication,
-                TaskInfo = taskInfo
-            };
-            taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
-            taskControls.Timer.Start();
+                    lblDynamic.ForeColor = Color.Gray;
+                    lblDynamic.Text = $"Zadanie: {eventName} nie uruchomi³o siê: {targetDateTime.ToString()}";
+                    btnDynamic.Text = "Usuñ";
 
-            taskControlsList.Add(taskControls);
+                }
+                else
+                {
+                    lblDynamic.ForeColor = Color.FromArgb(51, 51, 51);
+                    lblDynamic.Text = $"Zadanie: {eventName} uruchomi siê: {targetDateTime.ToString()}";
+                    btnDynamic.Text = "Anuluj";
+                }
 
-            activeTasksPanel.Controls.Add(lblDynamic);
-            activeTasksPanel.Controls.Add(btnDynamic);
+                TaskInfo taskInfo = new TaskInfo
+                {
+                    EventName = eventName,
+                    TargetApplication = targetApplication,
+                    TargetDateTime = targetDateTime
+                };
 
-            SaveTaskData();
+                TaskControls taskControls = new TaskControls
+                {
+                    Label = lblDynamic,
+                    Button = btnDynamic,
+                    Timer = new System.Timers.Timer()
+                    {
+                        Interval = 5000,
+                    },
+                    TargetPath = targetApplication,
+                    TaskInfo = taskInfo
+                };
+                taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
+                taskControls.Timer.Start();
 
-            // Adjust the layout
-            foreach (TaskControls taskControl in taskControlsList)
+                taskControlsList.Add(taskControls);
+
+                activeTasksPanel.Controls.Add(lblDynamic);
+                activeTasksPanel.Controls.Add(btnDynamic);
+
+                SaveTaskData();
+
+                // Adjust the layout
+                foreach (TaskControls taskControl in taskControlsList)
+                {
+                    taskControl.Label.Width = activeTasksPanel.Width - 120;
+                    taskControl.Button.Left = taskControl.Label.Width + 20;
+                }
+
+                Top += 60;
+            }
+            catch (Exception ex)
             {
-                taskControl.Label.Width = activeTasksPanel.Width - 120;
-                taskControl.Button.Left = taskControl.Label.Width + 20;
+                MessageBox.Show($"Wyst¹pi³ problem z zapisem danych zadania: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            Top += 60;
         }
 
         //Cancel or remove given task
@@ -257,35 +272,70 @@ namespace TaskSchedulerForm
         // Save task data to a JSON file
         private void SaveTaskData()
         {
-            
-            List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
-            string json = JsonSerializer.Serialize(taskInfos, new JsonSerializerOptions
+            try
             {
-                WriteIndented = true
-            });
-            string jsonFileName = "taskData.json";
-            string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
-            File.WriteAllText(jsonFilePath, json);
+                List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
+                string json = JsonSerializer.Serialize(taskInfos, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                string jsonFileName = "taskData.json";
+                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
+
+                // Check if the selectedFolderPath is accessible
+                if (!FolderUtils.CanAccessFolder(selectedFolderPath))
+                {
+                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                File.WriteAllText(jsonFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Wyst¹pi³ nieznany problem z zapisem danych zadania: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
+   
 
         // Load task data from a JSON file
         private void LoadTaskData()
         {
-            string jsonFileName = "taskData.json";
-            string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
-            if (File.Exists(jsonFilePath))
+            try
             {
-                string json = File.ReadAllText(jsonFilePath);
-                List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
-
-                if (taskInfos != null)
+                string jsonFileName = "taskData.json";
+                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
+                if (!Directory.Exists(selectedFolderPath))
                 {
-                    foreach (var taskInfo in taskInfos)
+                    Directory.CreateDirectory(selectedFolderPath);
+                }
+                    // Check if the selectedFolderPath is accessible
+                    if (!FolderUtils.CanAccessFolder(selectedFolderPath))
+                {
+                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (File.Exists(jsonFilePath))
+                {
+                    string json = File.ReadAllText(jsonFilePath);
+                    List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
+
+                    if (taskInfos != null)
                     {
-                        bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
-                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed);
+                        foreach (var taskInfo in taskInfos)
+                        {
+                            bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
+                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Wyst¹pi³ problem ze wczytaniem danych zadania: {ex.Message}", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -294,9 +344,8 @@ namespace TaskSchedulerForm
         {
             try
             {
-                string Location = @"C:\Program Files";
-                string configFolderPath = Path.Combine(Location, "HarmonogramMK");
-                string configFilePath = Path.Combine(configFolderPath, "config.json");
+                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
+                string configFilePath = Path.Combine(appDataFolder, "config.json");
 
                 if (File.Exists(configFilePath))
                 {
@@ -312,7 +361,7 @@ namespace TaskSchedulerForm
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Wyst¹pi³ b³¹d prx: {ex.Message}", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Wyst¹pi³ b³¹d przy wczytywaniu konfiguracji: {ex.Message}", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }

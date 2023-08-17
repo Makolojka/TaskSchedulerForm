@@ -60,7 +60,6 @@
             label2.Size = new Size(432, 35);
             label2.TabIndex = 1;
             label2.Text = "Folder zapisu zadań";
-            label2.Click += label2_Click;
             // 
             // flowLayoutPanel2
             // 
@@ -176,7 +175,6 @@
             MinimumSize = new Size(552, 600);
             Name = "AccessibilityForm";
             Text = "Ustawienia";
-            Load += AccessibilityForm_Load;
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             ResumeLayout(false);
