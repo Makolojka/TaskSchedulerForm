@@ -212,7 +212,7 @@ namespace TaskSchedulerForm
             DateTime currentTime = DateTime.Now;
             DateTime scheduledTime = GetScheduledTimeFromLabelText(taskControls.Label.Text);
             TaskType taskType = taskControls.TaskInfo.Type;
-
+            MessageBox.Show("Type zadania:"+taskControls.TaskInfo.Type);
             if (taskType == TaskType.OneTime)
             {
                 if (scheduledTime <= currentTime)
@@ -263,6 +263,54 @@ namespace TaskSchedulerForm
 
                         // Aktualizacja dnia zadania codziennego
                         DateTime newScheduledTime = scheduledTime.AddDays(1);
+
+                        // Zmienia harmonogram istniej¹cego zadania
+                        taskControls.TaskInfo.TargetDateTime = newScheduledTime;
+                        taskControls.Timer.Stop();
+                        taskControls.Timer.Dispose();
+                        taskControls.Timer = new System.Timers.Timer
+                        {
+                            Interval = (newScheduledTime - DateTime.Now).TotalMilliseconds,
+                            AutoReset = false
+                        };
+                        taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
+                        taskControls.Timer.Start();
+
+                        // Aktualizacja UI
+                        activeTasksPanel.Invoke(new Action(() =>
+                        {
+                            taskControls.Label.Text = $"Zadanie: {taskControls.TaskInfo.EventName} uruchomi siê: {newScheduledTime.ToString()}";
+                            taskControls.Button.Text = "Anuluj";
+                        }));
+
+                        // Aktualizacja pliku json
+                        SaveTaskData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Nieznany b³¹d: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            else if (taskType == TaskType.Weekly)
+            {
+                if (scheduledTime.Date <= currentTime.Date)
+                {
+                    // Startuje proces zadania cotygodniowego
+                    try
+                    {
+                        try
+                        {
+                            string processPath = taskControls.TargetPath;
+                            Process.Start(processPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Nie uda³o siê uruchomiæ zaplanowanego procesu: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+
+                        // Aktualizacja dnia zadania cotygodniowego
+                        DateTime newScheduledTime = scheduledTime.AddDays(7);
 
                         // Zmienia harmonogram istniej¹cego zadania
                         taskControls.TaskInfo.TargetDateTime = newScheduledTime;
@@ -398,6 +446,13 @@ namespace TaskSchedulerForm
                                 DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
                                 AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
                             }
+                            else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
+                            {
+                                eventHasPassed = false;
+
+                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
+                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                            }
                             else
                             {
                                 AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
@@ -495,6 +550,14 @@ namespace TaskSchedulerForm
             if (radioButton2.Checked)
             {
                 this.taskType = TaskType.Daily;
+            }
+        }
+
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton3.Checked)
+            {
+                this.taskType = TaskType.Weekly;
             }
         }
     }

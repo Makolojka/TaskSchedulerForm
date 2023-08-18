@@ -17,7 +17,8 @@ namespace TaskSchedulerForm
     public enum TaskType
     {
         OneTime,
-        Daily
+        Daily,
+        Weekly
     }
 
 }
