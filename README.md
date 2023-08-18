@@ -3,7 +3,7 @@
 HarmonogramMK to prosta aplikacja do planowania zadań. Umożliwia ona tworzenie zadań uruchamijących inne aplikacje o wybranej porze. 
 Zadania wykonywane są automatycznie o określonym przez użytkownika czasie. Aplikacja zapewnia łatwy sposób dodawania zadań, 
 które będą wykonane w określonych godzinach, dniach lub co określony czas np. codziennie lub co tydzień.
-![Reference Image](/screenshots/1.png)
+![Reference Image](./TaskSchedulerForm/screenshots/1.png)
 
 ## Funkcje
 
@@ -20,13 +20,13 @@ powinna się uruchomić lub może wybrać ścieżkę używając eksploratora pli
 **Codzienne** zadanie będzie wykonywać się codziennie o tej samej porze dopóki użytkownik go nie anuluje.
 **Cotygodniowe** zadanie będzie wykonywać się co tydzień o tej samej porze dopóki użytkownik go nie anuluje.
 - **Utwórz zadanie**: przycisk umożliwia dodanie nowego zadania.
-![Reference Image](/screenshots/2.png)
+![Reference Image](./TaskSchedulerForm/screenshots/2.png)
 
 ###  Podgląd zadań
 - **Aktywne zadania**: W tym oknie widoczne są wszystkie aktywne zadania oraz takie, które 
 nie mogły wykonać się ze względu na niedostępność aplikacji w czasie w którym powinny się uruchomić. 
 Użytkownik ma tu również możliwość anulowania zadania lub usunięcia(nie wykonane zadania).
-![Reference Image](/screenshots/3.png)
+![Reference Image](./TaskSchedulerForm/screenshots/3.png)
 
 ###  Inne funkcjonalności
 - **Automatyczny zapis**: Aplikacja automatycznie zapisuje zadania, nawet po zamknięciu programu.
@@ -34,11 +34,11 @@ Użytkownik ma tu również możliwość anulowania zadania lub usunięcia(nie w
 Użytkownik może tu zmienić folder zapisu zadań lub włączyć/wyłączyć możliwość uruchamiania aplikacji wraz ze startem systemu.
 - **Minimalizacja/praca w tle**: po kliknięciu minimalizuj aplikacja minimalizuje się, a jej ikona pojawia się w zasobniku systemowym(system tray).
 Podwójne kliknięcie na ikonę pozwala otworzyć okno aplikacji z powrotem. 
-![Reference Image](/screenshots/5.png)
+![Reference Image](./TaskSchedulerForm/screenshots/5.png)
 
 ## Jak pobrać?
 
-1. **Pobranie**: Pobierz najnowszą wersję HarmonogramMK z [Releases](https://github.com/your-username/HarmonogramMK/releases).
+1. **Pobranie**: Pobierz najnowszą wersję HarmonogramMK z [Releases](https://github.com/Makolojka/HarmonogramMK/releases).
 2. **Instalacja**: Wystarczy uruchomić pobrany plik wykonywalny, aby otworzyć aplikację.
 
 ## Użycie
