@@ -15,5 +15,6 @@ namespace TaskSchedulerForm
 
         public string TargetPath { get; set; }
         public TaskInfo TaskInfo { get; set; }
+
     }
 }
