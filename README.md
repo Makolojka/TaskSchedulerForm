@@ -1,6 +1,6 @@
 # HarmonogramMK
 
-HarmonogramMK to prosta aplikacja do planowania zadań. Umożliwia ona tworzenie zadań uruchamijących inne aplikacje o wybranej porze. 
+HarmonogramMK to prosta aplikacja do planowania zadań. Umożliwia ona tworzenie zadań uruchamiających inne aplikacje o wybranej porze. 
 Zadania wykonywane są automatycznie o określonym przez użytkownika czasie. Aplikacja zapewnia łatwy sposób dodawania zadań, 
 które będą wykonane w określonych godzinach, dniach lub co określony czas np. codziennie lub co tydzień.
 ![Reference Image](./TaskSchedulerForm/screenshots/1.png)
