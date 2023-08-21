@@ -22,6 +22,7 @@ namespace TaskSchedulerForm
         private bool isAppStartChecked = true;
         private TaskType taskType = TaskType.OneTime;
         int Top = 50;
+        private readonly UserConfigurationManager _configManager;
         public string SelectedFolderPath
         {
             get { return selectedFolderPath; }
@@ -33,8 +34,12 @@ namespace TaskSchedulerForm
             get { return isAppStartChecked; }
             set { isAppStartChecked = value; }
         }
-        public Form1()
+        public Form1(UserConfigurationManager configManager)
         {
+            _configManager = configManager;
+            //MessageBox.Show("configManager: " + configManager.LoadConfiguration());
+            AppConfiguration config = configManager.LoadConfiguration();
+
             InitializeComponent();
 
             //Zape³nia liczbami ComboBoxy dla wyboru godziny i minut
@@ -51,7 +56,7 @@ namespace TaskSchedulerForm
             cmbHours.Validating += cmbHours_Validating;
             cmbMinutes.Validating += cmbMinutes_Validating;
 
-            LoadConfiguration();
+            LoadConfiguration(config);
             LoadTaskData();
             checkIfAppStartChecked();
 
@@ -460,24 +465,14 @@ namespace TaskSchedulerForm
         }
 
         // £aduje konfiguracjê/preferencje u¿ytkowników
-        private void LoadConfiguration()
+        private void LoadConfiguration(AppConfiguration config)
         {
             try
             {
-                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
-                string configFilePath = Path.Combine(appDataFolder, "config.json");
-
-                //Je¿eli plik z konfiguracj¹ istnieje zczytuje dane
-                if (File.Exists(configFilePath))
+                if (config.SelectedFolderPath != null)
                 {
-                    string json = File.ReadAllText(configFilePath);
-                    AppConfiguration config = JsonSerializer.Deserialize<AppConfiguration>(json);
-
-                    if (config.SelectedFolderPath != null)
-                    {
-                        selectedFolderPath = config.SelectedFolderPath;
-                        isAppStartChecked = config.IsAppStartChecked;
-                    }
+                    selectedFolderPath = config.SelectedFolderPath;
+                    isAppStartChecked = config.IsAppStartChecked;
                 }
             }
             catch (Exception ex)
@@ -490,7 +485,7 @@ namespace TaskSchedulerForm
         // Pokazuje modal z ustawieniami do wyboru/zmiany
         private void accessibilityBtn_Click(object sender, EventArgs e)
         {
-            AccessibilityForm accessibilityForm = new AccessibilityForm(this);
+            AccessibilityForm accessibilityForm = new AccessibilityForm(this, this._configManager);
             accessibilityForm.ShowDialog();
         }
 
