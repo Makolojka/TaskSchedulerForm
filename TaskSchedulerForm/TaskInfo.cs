@@ -11,5 +11,14 @@ namespace TaskSchedulerForm
         public string EventName { get; set; }
         public string TargetApplication { get; set; }
         public DateTime TargetDateTime { get; set; }
+        public TaskType Type { get; set; }
     }
+
+    public enum TaskType
+    {
+        OneTime,
+        Daily,
+        Weekly
+    }
+
 }

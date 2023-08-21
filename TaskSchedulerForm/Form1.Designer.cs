@@ -35,6 +35,11 @@ namespace TaskSchedulerForm
             btnSchedule = new Button();
             label1 = new Label();
             eventCreatorGroup = new GroupBox();
+            panel2 = new Panel();
+            radioButton3 = new RadioButton();
+            radioButton2 = new RadioButton();
+            radioButton1 = new RadioButton();
+            label7 = new Label();
             changePathBtn = new Button();
             dotSeparator = new Label();
             cmbMinutes = new ComboBox();
@@ -53,6 +58,7 @@ namespace TaskSchedulerForm
             accessibilityBtn = new Button();
             label6 = new Label();
             eventCreatorGroup.SuspendLayout();
+            panel2.SuspendLayout();
             activeTasks.SuspendLayout();
             panel1.SuspendLayout();
             SuspendLayout();
@@ -64,7 +70,7 @@ namespace TaskSchedulerForm
             btnSchedule.FlatStyle = FlatStyle.Flat;
             btnSchedule.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
             btnSchedule.ForeColor = Color.White;
-            btnSchedule.Location = new Point(35, 478);
+            btnSchedule.Location = new Point(36, 620);
             btnSchedule.Margin = new Padding(4);
             btnSchedule.Name = "btnSchedule";
             btnSchedule.Size = new Size(420, 55);
@@ -76,7 +82,7 @@ namespace TaskSchedulerForm
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(23, 148);
+            label1.Location = new Point(19, 148);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
             label1.Size = new Size(181, 28);
@@ -85,6 +91,8 @@ namespace TaskSchedulerForm
             // 
             // eventCreatorGroup
             // 
+            eventCreatorGroup.Controls.Add(panel2);
+            eventCreatorGroup.Controls.Add(label7);
             eventCreatorGroup.Controls.Add(changePathBtn);
             eventCreatorGroup.Controls.Add(dotSeparator);
             eventCreatorGroup.Controls.Add(cmbMinutes);
@@ -101,10 +109,66 @@ namespace TaskSchedulerForm
             eventCreatorGroup.Margin = new Padding(4);
             eventCreatorGroup.Name = "eventCreatorGroup";
             eventCreatorGroup.Padding = new Padding(4);
-            eventCreatorGroup.Size = new Size(494, 571);
+            eventCreatorGroup.Size = new Size(494, 692);
             eventCreatorGroup.TabIndex = 2;
             eventCreatorGroup.TabStop = false;
             eventCreatorGroup.Text = "Utwórz zadanie";
+            // 
+            // panel2
+            // 
+            panel2.Controls.Add(radioButton3);
+            panel2.Controls.Add(radioButton2);
+            panel2.Controls.Add(radioButton1);
+            panel2.Location = new Point(36, 493);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(420, 120);
+            panel2.TabIndex = 13;
+            // 
+            // radioButton3
+            // 
+            radioButton3.AutoSize = true;
+            radioButton3.Location = new Point(0, 79);
+            radioButton3.Name = "radioButton3";
+            radioButton3.Size = new Size(126, 32);
+            radioButton3.TabIndex = 2;
+            radioButton3.TabStop = true;
+            radioButton3.Text = "Co tydzień";
+            radioButton3.UseVisualStyleBackColor = true;
+            radioButton3.CheckedChanged += radioButton3_CheckedChanged;
+            // 
+            // radioButton2
+            // 
+            radioButton2.AutoSize = true;
+            radioButton2.Location = new Point(0, 41);
+            radioButton2.Name = "radioButton2";
+            radioButton2.Size = new Size(130, 32);
+            radioButton2.TabIndex = 1;
+            radioButton2.Text = "Codziennie";
+            radioButton2.UseVisualStyleBackColor = true;
+            radioButton2.CheckedChanged += radioButton2_CheckedChanged;
+            // 
+            // radioButton1
+            // 
+            radioButton1.AutoSize = true;
+            radioButton1.Checked = true;
+            radioButton1.Location = new Point(0, 3);
+            radioButton1.Name = "radioButton1";
+            radioButton1.Size = new Size(114, 32);
+            radioButton1.TabIndex = 0;
+            radioButton1.TabStop = true;
+            radioButton1.Text = "Jeden raz";
+            radioButton1.UseVisualStyleBackColor = true;
+            radioButton1.CheckedChanged += radioButton1_CheckedChanged;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(19, 462);
+            label7.Margin = new Padding(4, 0, 4, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(327, 28);
+            label7.TabIndex = 12;
+            label7.Text = "Kiedy ma być uruchamiane zadanie?";
             // 
             // changePathBtn
             // 
@@ -124,7 +188,7 @@ namespace TaskSchedulerForm
             // 
             // dotSeparator
             // 
-            dotSeparator.Location = new Point(90, 398);
+            dotSeparator.Location = new Point(90, 385);
             dotSeparator.Name = "dotSeparator";
             dotSeparator.Size = new Size(16, 36);
             dotSeparator.TabIndex = 9;
@@ -133,7 +197,7 @@ namespace TaskSchedulerForm
             // cmbMinutes
             // 
             cmbMinutes.FormattingEnabled = true;
-            cmbMinutes.Location = new Point(113, 398);
+            cmbMinutes.Location = new Point(113, 385);
             cmbMinutes.Margin = new Padding(4);
             cmbMinutes.Name = "cmbMinutes";
             cmbMinutes.Size = new Size(60, 36);
@@ -142,7 +206,7 @@ namespace TaskSchedulerForm
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(23, 353);
+            label5.Location = new Point(19, 353);
             label5.Margin = new Padding(4, 0, 4, 0);
             label5.Name = "label5";
             label5.Size = new Size(154, 28);
@@ -152,7 +216,7 @@ namespace TaskSchedulerForm
             // cmbHours
             // 
             cmbHours.FormattingEnabled = true;
-            cmbHours.Location = new Point(23, 398);
+            cmbHours.Location = new Point(23, 385);
             cmbHours.Margin = new Padding(4);
             cmbHours.Name = "cmbHours";
             cmbHours.Size = new Size(60, 36);
@@ -171,7 +235,7 @@ namespace TaskSchedulerForm
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(23, 251);
+            label3.Location = new Point(19, 251);
             label3.Margin = new Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new Size(177, 28);
@@ -200,7 +264,7 @@ namespace TaskSchedulerForm
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(23, 48);
+            label2.Location = new Point(19, 48);
             label2.Margin = new Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new Size(142, 28);
@@ -226,7 +290,7 @@ namespace TaskSchedulerForm
             activeTasks.Margin = new Padding(4);
             activeTasks.Name = "activeTasks";
             activeTasks.Padding = new Padding(4);
-            activeTasks.Size = new Size(804, 571);
+            activeTasks.Size = new Size(804, 692);
             activeTasks.TabIndex = 4;
             activeTasks.TabStop = false;
             activeTasks.Text = "Aktywne zadania";
@@ -237,7 +301,7 @@ namespace TaskSchedulerForm
             activeTasksPanel.Location = new Point(8, 40);
             activeTasksPanel.Margin = new Padding(4);
             activeTasksPanel.Name = "activeTasksPanel";
-            activeTasksPanel.Size = new Size(788, 523);
+            activeTasksPanel.Size = new Size(788, 635);
             activeTasksPanel.TabIndex = 0;
             // 
             // notifyIcon1
@@ -290,7 +354,7 @@ namespace TaskSchedulerForm
             AutoScaleDimensions = new SizeF(11F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1382, 703);
+            ClientSize = new Size(1382, 853);
             Controls.Add(label6);
             Controls.Add(panel1);
             Controls.Add(activeTasks);
@@ -300,12 +364,14 @@ namespace TaskSchedulerForm
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4);
             MaximizeBox = false;
-            MaximumSize = new Size(1400, 750);
+            MaximumSize = new Size(1400, 900);
             Name = "Form1";
             Text = "Harmonogram zadań";
             SizeChanged += Form1_SizeChanged;
             eventCreatorGroup.ResumeLayout(false);
             eventCreatorGroup.PerformLayout();
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             activeTasks.ResumeLayout(false);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
@@ -335,5 +401,10 @@ namespace TaskSchedulerForm
         private Button accessibilityBtn;
         private Button changePathBtn;
         private Label label6;
+        private Label label7;
+        private Panel panel2;
+        private RadioButton radioButton2;
+        private RadioButton radioButton1;
+        private RadioButton radioButton3;
     }
 }

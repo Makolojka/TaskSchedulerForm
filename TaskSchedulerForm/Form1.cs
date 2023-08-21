@@ -20,6 +20,7 @@ namespace TaskSchedulerForm
         private static List<TaskControls> taskControlsList = new List<TaskControls>();
         private string selectedFolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
         private bool isAppStartChecked = true;
+        private TaskType taskType = TaskType.OneTime;
         int Top = 50;
         public string SelectedFolderPath
         {
@@ -47,11 +48,34 @@ namespace TaskSchedulerForm
                 cmbMinutes.Items.Add(i);
             }
 
+            cmbHours.Validating += cmbHours_Validating;
+            cmbMinutes.Validating += cmbMinutes_Validating;
+
             LoadConfiguration();
             LoadTaskData();
             checkIfAppStartChecked();
 
         }
+
+        //Wyœwietla komunikat je¿eli u¿ytkownik wprowadzi³ z³y format godziny oraz utrzymuje focus na polu
+        private void cmbHours_Validating(object sender, CancelEventArgs e)
+        {
+            if (!int.TryParse(cmbHours.Text, out int hour) || hour < 0 || hour > 23)
+            {
+                MessageBox.Show("WprowadŸ prawid³ow¹ godzinê (0-23).", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Cancel = true; // Blokuje mo¿liwoœæ zmiany focusu z pola
+            }
+        }
+        //Wyœwietla komunikat je¿eli u¿ytkownik wprowadzi³ z³y format minut oraz utrzymuje focus na polu
+        private void cmbMinutes_Validating(object sender, CancelEventArgs e)
+        {
+            if (!int.TryParse(cmbMinutes.Text, out int minute) || minute < 0 || minute > 59)
+            {
+                MessageBox.Show("WprowadŸ prawid³ow¹ minutê (0-59).", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Cancel = true; // Blokuje mo¿liwoœæ zmiany focusu z pola
+            }
+        }
+
 
         //Sprawdza pola i dodaje nowe zadanie
         private void button1_Click(object sender, EventArgs e)
@@ -62,8 +86,8 @@ namespace TaskSchedulerForm
             DateTime selectedDate = dateTimePicker.Value;
 
             // Pobiera wybran¹ godzinê i minutê z ComboBox'ów
-            int selectedHour = cmbHours.SelectedItem != null ? (int)cmbHours.SelectedItem : -1;
-            int selectedMinute = cmbMinutes.SelectedItem != null ? (int)cmbMinutes.SelectedItem : -1;
+            int selectedHour = int.TryParse(cmbHours.Text, out int hour) ? hour : -1;
+            int selectedMinute = int.TryParse(cmbMinutes.Text, out int minute) ? minute : -1;
 
             // Sprawdza poprawnoœæ pól wejœciowych
             if (string.IsNullOrWhiteSpace(eventName) || string.IsNullOrWhiteSpace(targetApplication))
@@ -95,11 +119,11 @@ namespace TaskSchedulerForm
                 return;
             }
 
-            AddTask(eventName, targetApplication, targetDateTime, false);
+            AddTask(eventName, targetApplication, targetDateTime, false, this.taskType);
         }
 
         //Dodaje nowe zadanie do listy zadañ
-        private void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed)
+        private void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed, TaskType type)
         {
             try
             {
@@ -122,6 +146,22 @@ namespace TaskSchedulerForm
                 btnDynamic.TextAlign = ContentAlignment.MiddleCenter;
                 btnDynamic.Click += btnDynamicTask_Click;
 
+                TaskInfo taskInfo = new TaskInfo
+                {
+                    EventName = eventName,
+                    TargetApplication = targetApplication,
+                    TargetDateTime = targetDateTime,
+                    Type = type
+                };
+
+                TaskControls taskControls = new TaskControls
+                {
+                    Label = lblDynamic,
+                    Button = btnDynamic,
+                    TargetPath = targetApplication,
+                    TaskInfo = taskInfo
+                };
+
                 if (eventHasPassed)
                 {
                     lblDynamic.BackColor = Color.FromArgb(214, 144, 144);
@@ -129,35 +169,21 @@ namespace TaskSchedulerForm
                     lblDynamic.Text = $"Zadanie: {eventName} nie uruchomi³o siê: {targetDateTime.ToString()}";
                     btnDynamic.Text = "Usuñ";
                     btnDynamic.BackColor = Color.FromArgb(214, 144, 144);
-
                 }
                 else
                 {
                     lblDynamic.ForeColor = Color.FromArgb(250, 250, 250);
                     lblDynamic.Text = $"Zadanie: {eventName} uruchomi siê: {targetDateTime.ToString()}";
                     btnDynamic.Text = "Anuluj";
-                }
 
-                TaskInfo taskInfo = new TaskInfo
-                {
-                    EventName = eventName,
-                    TargetApplication = targetApplication,
-                    TargetDateTime = targetDateTime
-                };
-
-                TaskControls taskControls = new TaskControls
-                {
-                    Label = lblDynamic,
-                    Button = btnDynamic,
-                    Timer = new System.Timers.Timer()
+                    // Tworzy timer tylko je¿eli zadanie nie jest przedawnione
+                    taskControls.Timer = new System.Timers.Timer()
                     {
-                        Interval = 5000,
-                    },
-                    TargetPath = targetApplication,
-                    TaskInfo = taskInfo
-                };
-                taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
-                taskControls.Timer.Start();
+                        Interval = (targetDateTime - DateTime.Now).TotalMilliseconds
+                    };
+                    taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
+                    taskControls.Timer.Start();
+                }
 
                 taskControlsList.Add(taskControls);
 
@@ -165,6 +191,7 @@ namespace TaskSchedulerForm
                 activeTasksPanel.Controls.Add(btnDynamic);
 
                 SaveTaskData();
+
 
                 // Dostosowuje uk³ad UI
                 foreach (TaskControls taskControl in taskControlsList)
@@ -190,8 +217,11 @@ namespace TaskSchedulerForm
 
             if (taskToRemove != null)
             {
-                taskToRemove.Timer.Stop();
-                taskToRemove.Timer.Dispose();
+                if(taskToRemove.Timer != null)
+                {
+                    taskToRemove.Timer.Stop();
+                    taskToRemove.Timer.Dispose();
+                }
 
                 taskControlsList.Remove(taskToRemove);
                 activeTasksPanel.Controls.Remove(taskToRemove.Label);
@@ -203,37 +233,103 @@ namespace TaskSchedulerForm
 
 
         //Wykonuje siê, gdy up³ynie czas timera
+        //TODO: do ewentualnego refactoru ze wzglêdu na powtórzenia kodu
         private void TaskTimer_Elapsed(TaskControls taskControls, object sender, System.Timers.ElapsedEventArgs e)
         {
-            DateTime currentTime = DateTime.Now;
-            DateTime scheduledTime = GetScheduledTimeFromLabelText(taskControls.Label.Text);
-
-            if (scheduledTime.Date == currentTime.Date && scheduledTime.Hour == currentTime.Hour && scheduledTime.Minute == currentTime.Minute)
+            try
             {
-                taskControls.Timer.Stop();
+                DateTime currentTime = DateTime.Now;
+                DateTime scheduledTime = GetScheduledTimeFromLabelText(taskControls.Label.Text);
+                TaskType taskType = taskControls.TaskInfo.Type;
 
-                // Wystartuj proces
-                try
+                if (scheduledTime <= currentTime)
                 {
-                    string processPath = taskControls.TargetPath;
-                    Process.Start(processPath);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Nie uda³o siê uruchomiæ zaplanowanego procesu: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                    if (taskType == TaskType.OneTime)
+                    {
+                        taskControls.Timer.Stop();
+                        taskControls.Timer.Dispose();
 
-                // Usuwa zadanie
-                taskControlsList.Remove(taskControls);
-                activeTasksPanel.Invoke(new Action(() =>
-                {
-                    activeTasksPanel.Controls.Remove(taskControls.Label);
-                    activeTasksPanel.Controls.Remove(taskControls.Button);
-                    Top -= 60;
-                }));
+                        // Startuje proces jednorazowy
+                        try
+                        {
+                            string processPath = taskControls.TargetPath;
+                            Process.Start(processPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Nie uda³o siê uruchomiæ zaplanowanego procesu: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
 
-                //Aktualizacja pliku json z zadaniami
-                SaveTaskData();
+                        // Usuwa zadanie
+                        taskControlsList.Remove(taskControls);
+                        activeTasksPanel.Invoke(new Action(() =>
+                        {
+                            activeTasksPanel.Controls.Remove(taskControls.Label);
+                            activeTasksPanel.Controls.Remove(taskControls.Button);
+                            Top -= 60;
+                        }));
+
+                        // Aktualizacja pliku json
+                        SaveTaskData();
+                    }
+                    else if (taskType != TaskType.OneTime)
+                    {
+                        // Startuje proces zadania codziennego lub cotygodniowego
+                    
+                            try
+                            {
+                                string processPath = taskControls.TargetPath;
+                                Process.Start(processPath);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Nie uda³o siê uruchomiæ zaplanowanego procesu: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+
+                            // Aktualizacja dnia zadania codziennego
+                            DateTime newScheduledTime;
+
+                            if (taskType == TaskType.Daily)
+                            {
+                                newScheduledTime = scheduledTime.AddDays(1);
+                            }
+                            else if (taskType == TaskType.Weekly)
+                            {
+                                newScheduledTime = scheduledTime.AddDays(7);
+                            }
+                            else
+                            {
+                                return;
+                            }
+
+
+                            // Zmienia harmonogram istniej¹cego zadania
+                            taskControls.TaskInfo.TargetDateTime = newScheduledTime;
+                            taskControls.Timer.Stop();
+                            taskControls.Timer.Dispose();
+                            taskControls.Timer = new System.Timers.Timer
+                            {
+                                Interval = (newScheduledTime - DateTime.Now).TotalMilliseconds,
+                                AutoReset = false
+                            };
+                            taskControls.Timer.Elapsed += (s, ev) => TaskTimer_Elapsed(taskControls, s, ev);
+                            taskControls.Timer.Start();
+
+                            // Aktualizacja UI
+                            activeTasksPanel.Invoke(new Action(() =>
+                            {
+                                taskControls.Label.Text = $"Zadanie: {taskControls.TaskInfo.EventName} uruchomi siê: {newScheduledTime.ToString()}";
+                                taskControls.Button.Text = "Anuluj";
+                            }));
+
+                            // Aktualizacja pliku json
+                            SaveTaskData();
+                        }
+                    }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nieznany b³¹d: " + ex.Message, "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -332,7 +428,27 @@ namespace TaskSchedulerForm
                         foreach (var taskInfo in taskInfos)
                         {
                             bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
-                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed);
+
+                            // Dodatkowe sprawdzenie czy zadanie siê przedawni³o i jest typu Daily
+                            if (eventHasPassed && taskInfo.Type == TaskType.Daily)
+                            {
+                                eventHasPassed = false;
+
+                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
+                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                            }
+                            else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
+                            {
+                                eventHasPassed = false;
+
+                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
+                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                            }
+                            else
+                            {
+                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
+                            }
+
                         }
                     }
                 }
@@ -411,8 +527,27 @@ namespace TaskSchedulerForm
                 StartupManager.RemoveShortcutFromStartup();
             }
         }
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton1.Checked)
+            {
+                this.taskType = TaskType.OneTime;
+            }
+        }
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton2.Checked)
+            {
+                this.taskType = TaskType.Daily;
+            }
+        }
 
-
-
+        private void radioButton3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton3.Checked)
+            {
+                this.taskType = TaskType.Weekly;
+            }
+        }
     }
 }
