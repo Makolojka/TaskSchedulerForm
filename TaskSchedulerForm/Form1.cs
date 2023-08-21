@@ -23,6 +23,8 @@ namespace TaskSchedulerForm
         private TaskType taskType = TaskType.OneTime;
         int Top = 50;
         private readonly UserConfigurationManager _configManager;
+
+        private readonly ITaskDAO _taskDAO;
         public string SelectedFolderPath
         {
             get { return selectedFolderPath; }
@@ -34,9 +36,10 @@ namespace TaskSchedulerForm
             get { return isAppStartChecked; }
             set { isAppStartChecked = value; }
         }
-        public Form1(UserConfigurationManager configManager)
+        public Form1(UserConfigurationManager configManager, ITaskDAO taskDAO)
         {
             _configManager = configManager;
+            _taskDAO = taskDAO;
             //MessageBox.Show("configManager: " + configManager.LoadConfiguration());
             AppConfiguration config = configManager.LoadConfiguration();
 
@@ -128,7 +131,7 @@ namespace TaskSchedulerForm
         }
 
         //Dodaje nowe zadanie do listy zadañ
-        private void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed, TaskType type)
+        public void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed, TaskType type)
         {
             try
             {
@@ -374,29 +377,8 @@ namespace TaskSchedulerForm
         // Zapisuje dane zadania do pliku JSON
         private void SaveTaskData()
         {
-            try
-            {
-                List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
-                string json = JsonSerializer.Serialize(taskInfos, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                string jsonFileName = "taskData.json";
-                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
-
-                if (!FolderUtils.CanAccessFolder(selectedFolderPath))
-                {
-                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                File.WriteAllText(jsonFilePath, json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Wyst¹pi³ nieznany problem z zapisem danych zadania: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
+            _taskDAO.SaveTasks(taskInfos);
         }
 
 
@@ -404,63 +386,38 @@ namespace TaskSchedulerForm
         // £aduje dane zadañ z pliku JSON
         private void LoadTaskData()
         {
-            try
-            {
-                string jsonFileName = "taskData.json";
-                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
+            List<TaskInfo> taskInfos = new List<TaskInfo>();
+            taskInfos = _taskDAO.LoadTaskData(this.selectedFolderPath);
+            //List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
 
-                //Sprawdza czy folder istnieje, je¿eli nie istnieje tworzy go.
-                if (!Directory.Exists(selectedFolderPath))
+                if (taskInfos != null)
                 {
-                    Directory.CreateDirectory(selectedFolderPath);
-                }
-
-                // Sprawdza, czy wybrana œcie¿ka folderu jest dostêpna dla u¿ytkownika
-                if (!FolderUtils.CanAccessFolder(selectedFolderPath))
-                {
-                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                //Je¿eli plik z zadaniami istnieje zczytuje dane
-                if (File.Exists(jsonFilePath))
-                {
-                    string json = File.ReadAllText(jsonFilePath);
-                    List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
-
-                    if (taskInfos != null)
+                    foreach (var taskInfo in taskInfos)
                     {
-                        foreach (var taskInfo in taskInfos)
+                        bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
+
+                        // Dodatkowe sprawdzenie czy zadanie siê przedawni³o i jest typu Daily
+                        if (eventHasPassed && taskInfo.Type == TaskType.Daily)
                         {
-                            bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
+                            eventHasPassed = false;
 
-                            // Dodatkowe sprawdzenie czy zadanie siê przedawni³o i jest typu Daily
-                            if (eventHasPassed && taskInfo.Type == TaskType.Daily)
-                            {
-                                eventHasPassed = false;
-
-                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                            }
-                            else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
-                            {
-                                eventHasPassed = false;
-
-                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                            }
-                            else
-                            {
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
-                            }
-
+                            DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
+                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
                         }
+                        else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
+                        {
+                            eventHasPassed = false;
+
+                            DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
+                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                        }
+                        else
+                        {
+                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
+                        }
+
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Wyst¹pi³ problem ze wczytaniem danych zadania: {ex.Message}", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

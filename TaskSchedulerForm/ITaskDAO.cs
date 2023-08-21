@@ -9,6 +9,6 @@ namespace TaskSchedulerForm
     public interface ITaskDAO
     {
         void SaveTasks(List<TaskInfo> taskInfos);
-        List<TaskInfo> LoadTasks();
+        List<TaskInfo> LoadTaskData(string selectedFolderPath);
     }
 }

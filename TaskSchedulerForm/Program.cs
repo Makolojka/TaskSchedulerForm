@@ -13,8 +13,11 @@ namespace TaskSchedulerForm
             ApplicationConfiguration.Initialize();
 
             UserConfigurationManager configManager = new UserConfigurationManager();
+            AppConfiguration config = configManager.LoadConfiguration();
 
-            Application.Run(new Form1(configManager));
+            ITaskDAO _taskDAO = new JsonTaskDAO(config.SelectedFolderPath);
+
+            Application.Run(new Form1(configManager, _taskDAO));
         }
     }
 }
