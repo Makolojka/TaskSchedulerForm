@@ -12,16 +12,15 @@ namespace TaskSchedulerForm
         // Ładuje konfigurację/preferencje użytkowników do pliku JSON
         public AppConfiguration LoadConfiguration()
         {
+            string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
+            string configFilePath = Path.Combine(appDataFolder, "config.json");
+
             try
             {
-                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
-                string configFilePath = Path.Combine(appDataFolder, "config.json");
-
                 if (File.Exists(configFilePath))
                 {
                     string json = File.ReadAllText(configFilePath);
-                    AppConfiguration config = JsonSerializer.Deserialize<AppConfiguration>(json);
-                    return config;
+                    return JsonSerializer.Deserialize<AppConfiguration>(json);
                 }
             }
             catch (Exception ex)
@@ -29,7 +28,28 @@ namespace TaskSchedulerForm
                 MessageBox.Show($"Wystąpił błąd przy wczytywaniu konfiguracji: {ex.Message}", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            return null;
+            // Create a default configuration and save it
+            AppConfiguration defaultConfig = new AppConfiguration
+            {
+                SelectedFolderPath = appDataFolder,
+                IsAppStartChecked = false
+            };
+
+            try
+            {
+                string json = JsonSerializer.Serialize(defaultConfig, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+
+                File.WriteAllText(configFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Wystąpił błąd przy tworzeniu domyślnej konfiguracji: {ex.Message}", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return defaultConfig;
         }
 
         // Zapisuje konfigurację użytkownika do pliku JSON

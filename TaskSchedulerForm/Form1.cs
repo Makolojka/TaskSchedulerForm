@@ -386,38 +386,35 @@ namespace TaskSchedulerForm
         // £aduje dane zadañ z pliku JSON
         private void LoadTaskData()
         {
-            List<TaskInfo> taskInfos = new List<TaskInfo>();
-            taskInfos = _taskDAO.LoadTaskData(this.selectedFolderPath);
-            //List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
+            List<TaskInfo> taskInfos = _taskDAO.LoadTaskData(this.selectedFolderPath);
 
-                if (taskInfos != null)
+            if (taskInfos != null && taskInfos.Count > 0)
+            {
+                foreach (var taskInfo in taskInfos)
                 {
-                    foreach (var taskInfo in taskInfos)
+                    bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
+
+                    if (eventHasPassed && taskInfo.Type == TaskType.Daily)
                     {
-                        bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
-
-                        // Dodatkowe sprawdzenie czy zadanie siê przedawni³o i jest typu Daily
-                        if (eventHasPassed && taskInfo.Type == TaskType.Daily)
-                        {
-                            eventHasPassed = false;
-
-                            DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
-                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                        }
-                        else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
-                        {
-                            eventHasPassed = false;
-
-                            DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
-                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                        }
-                        else
-                        {
-                            AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
-                        }
-
+                        eventHasPassed = false;
+                        DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                    }
+                    else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
+                    {
+                        eventHasPassed = false;
+                        DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                    }
+                    else
+                    {
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
                     }
                 }
+            }
+            else
+            {
+                return;
             }
         }
 
