@@ -38,7 +38,7 @@ Podwójne kliknięcie na ikonę pozwala otworzyć okno aplikacji z powrotem.
 
 ## Jak pobrać?
 
-1. **Pobranie**: Pobierz najnowszą wersję HarmonogramMK z [Releases]([https://github.com/Makolojka/HarmonogramMK/releases](https://github.com/Makolojka/TaskSchedulerForm/releases/tag/v.1.0.0)).
+1. **Pobranie**: Pobierz najnowszą wersję HarmonogramMK z [Releases](https://github.com/Makolojka/TaskSchedulerForm/releases/tag/v.1.0.0).
 2. **Instalacja**: Wystarczy uruchomić pobrany plik wykonywalny, aby otworzyć aplikację.
 
 ## Użycie
