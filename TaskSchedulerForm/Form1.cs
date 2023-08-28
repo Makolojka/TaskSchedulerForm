@@ -40,7 +40,6 @@ namespace TaskSchedulerForm
         {
             _configManager = configManager;
             _taskDAO = taskDAO;
-            //MessageBox.Show("configManager: " + configManager.LoadConfiguration());
             AppConfiguration config = configManager.LoadConfiguration();
 
             InitializeComponent();

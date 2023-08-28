@@ -28,7 +28,7 @@ namespace TaskSchedulerForm
                 MessageBox.Show($"Wystąpił błąd przy wczytywaniu konfiguracji: {ex.Message}", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            // Create a default configuration and save it
+            // Tworzy domyślną konfigurację i ją zapisuje
             AppConfiguration defaultConfig = new AppConfiguration
             {
                 SelectedFolderPath = appDataFolder,
