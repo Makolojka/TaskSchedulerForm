@@ -21,7 +21,7 @@ powinna się uruchomić lub może wybrać ścieżkę używając eksploratora pli
 **Codzienne** zadanie będzie wykonywać się codziennie o tej samej porze dopóki użytkownik go nie anuluje.
 **Cotygodniowe** zadanie będzie wykonywać się co tydzień o tej samej porze dopóki użytkownik go nie anuluje.
 - **Utwórz zadanie**: przycisk umożliwia dodanie nowego zadania.
-- 
+  
 ![Reference Image](./TaskSchedulerForm/screenshots/2.png)
 
 ###  Podgląd zadań
