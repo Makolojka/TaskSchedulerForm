@@ -18,8 +18,10 @@ namespace TaskSchedulerForm
         private bool isAppStartChecked;
         private Form1 mainForm;
         private string selectedFolderPath;
-        public AccessibilityForm(Form1 form1Instance)
+        private readonly UserConfigurationManager _configManager;
+        public AccessibilityForm(Form1 form1Instance, UserConfigurationManager _configManager)
         {
+            this._configManager = _configManager;
             InitializeComponent();
             mainForm = form1Instance;
             selectedFolderPath = mainForm.SelectedFolderPath;
@@ -34,26 +36,6 @@ namespace TaskSchedulerForm
             {
                 radioButton2.Checked = true;
             }
-        }
-
-        private void AccessibilityForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
@@ -71,11 +53,7 @@ namespace TaskSchedulerForm
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
+        // Umożliwia wybór folderu
         private void changePathBtn_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -84,7 +62,14 @@ namespace TaskSchedulerForm
                 if (result == DialogResult.OK)
                 {
                     string selectedFolder = folderBrowserDialog.SelectedPath;
-                    textBox1.Text = selectedFolder;
+                    if (FolderUtils.CanAccessFolder(selectedFolder))
+                    {
+                        textBox1.Text = selectedFolder;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Brak uprawnień do zapisu w tym folderze.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
@@ -95,6 +80,7 @@ namespace TaskSchedulerForm
             this.Close();
         }
 
+        // Zapisuje konfigurację użytkownika
         private void SaveConfiguration()
         {
             try
@@ -109,27 +95,7 @@ namespace TaskSchedulerForm
                     mainForm.IsAppStartChecked = false;
                 }
 
-                AppConfiguration config = new AppConfiguration
-                {
-                    SelectedFolderPath = textBox1.Text,
-                    IsAppStartChecked = isAppStartChecked
-                };
-
-                string Location = @"C:\Program Files";
-                string appDataFolder = Path.Combine(Location, "HarmonogramMK");
-                string configFilePath = Path.Combine(appDataFolder, "config.json");
-
-                if (!Directory.Exists(appDataFolder))
-                {
-                    Directory.CreateDirectory(appDataFolder);
-                }
-
-                string json = JsonSerializer.Serialize(config, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                File.WriteAllText(configFilePath, json);
+                _configManager.SaveConfiguration(textBox1.Text, this.isAppStartChecked);
             }
             catch (Exception ex)
             {

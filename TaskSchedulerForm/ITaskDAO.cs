@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace TaskSchedulerForm
 {
-    [Serializable]
-    public class AppConfiguration
+    public interface ITaskDAO
     {
-        public string SelectedFolderPath { get; set; }
-        public bool IsAppStartChecked { get; set; }
+        void SaveTasks(List<TaskInfo> taskInfos);
+        List<TaskInfo> LoadTaskData(string selectedFolderPath);
     }
 }
