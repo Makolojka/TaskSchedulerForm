@@ -246,7 +246,7 @@ namespace TaskSchedulerForm
             try
             {
                 DateTime currentTime = DateTime.Now;
-                DateTime scheduledTime = GetScheduledTimeFromLabelText(taskControls.Label.Text);
+                DateTime scheduledTime = taskControls.TaskInfo.TargetDateTime;
                 TaskType taskType = taskControls.TaskInfo.Type;
 
                 if (scheduledTime <= currentTime)
@@ -340,19 +340,6 @@ namespace TaskSchedulerForm
             }
         }
 
-        //Parsuje/wy³uskuje datê z tekstu
-        private DateTime GetScheduledTimeFromLabelText(string labelText)
-        {
-            int startIndex = labelText.IndexOf("uruchomi siê: ") + "uruchomi siê: ".Length;
-
-            if (startIndex < "uruchomi siê: ".Length)
-            {
-                startIndex = labelText.IndexOf("nie uruchomi³o siê: ") + "nie uruchomi³o siê: ".Length;
-            }
-
-            string timeString = labelText.Substring(startIndex);
-            return DateTime.Parse(timeString);
-        }
 
         //Ukrywa aplikacjê do zasobnika systemowego(system tray)
         private void Form1_SizeChanged(object sender, EventArgs e)
