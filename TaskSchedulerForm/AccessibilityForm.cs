@@ -18,8 +18,10 @@ namespace TaskSchedulerForm
         private bool isAppStartChecked;
         private Form1 mainForm;
         private string selectedFolderPath;
-        public AccessibilityForm(Form1 form1Instance)
+        private readonly UserConfigurationManager _configManager;
+        public AccessibilityForm(Form1 form1Instance, UserConfigurationManager _configManager)
         {
+            this._configManager = _configManager;
             InitializeComponent();
             mainForm = form1Instance;
             selectedFolderPath = mainForm.SelectedFolderPath;
@@ -93,35 +95,7 @@ namespace TaskSchedulerForm
                     mainForm.IsAppStartChecked = false;
                 }
 
-                AppConfiguration config = new AppConfiguration
-                {
-                    SelectedFolderPath = textBox1.Text,
-                    IsAppStartChecked = isAppStartChecked
-                };
-
-                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
-                string configFilePath = Path.Combine(appDataFolder, "config.json");
-
-                if (!Directory.Exists(appDataFolder))
-                {
-                    Directory.CreateDirectory(appDataFolder);
-                }
-
-                string json = JsonSerializer.Serialize(config, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                File.WriteAllText(configFilePath, json);
-
-                if (isAppStartChecked)
-                {
-                    StartupManager.CreateShortcutInStartup();
-                }
-                else
-                {
-                    StartupManager.RemoveShortcutFromStartup();
-                }
+                _configManager.SaveConfiguration(textBox1.Text, this.isAppStartChecked);
             }
             catch (Exception ex)
             {

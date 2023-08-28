@@ -22,6 +22,9 @@ namespace TaskSchedulerForm
         private bool isAppStartChecked = true;
         private TaskType taskType = TaskType.OneTime;
         int Top = 50;
+        private readonly UserConfigurationManager _configManager;
+
+        private readonly ITaskDAO _taskDAO;
         public string SelectedFolderPath
         {
             get { return selectedFolderPath; }
@@ -33,8 +36,12 @@ namespace TaskSchedulerForm
             get { return isAppStartChecked; }
             set { isAppStartChecked = value; }
         }
-        public Form1()
+        public Form1(UserConfigurationManager configManager, ITaskDAO taskDAO)
         {
+            _configManager = configManager;
+            _taskDAO = taskDAO;
+            AppConfiguration config = configManager.LoadConfiguration();
+
             InitializeComponent();
 
             //Zape³nia liczbami ComboBoxy dla wyboru godziny i minut
@@ -51,7 +58,7 @@ namespace TaskSchedulerForm
             cmbHours.Validating += cmbHours_Validating;
             cmbMinutes.Validating += cmbMinutes_Validating;
 
-            LoadConfiguration();
+            LoadConfiguration(config);
             LoadTaskData();
             checkIfAppStartChecked();
 
@@ -123,7 +130,7 @@ namespace TaskSchedulerForm
         }
 
         //Dodaje nowe zadanie do listy zadañ
-        private void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed, TaskType type)
+        public void AddTask(string eventName, string targetApplication, DateTime targetDateTime, bool eventHasPassed, TaskType type)
         {
             try
             {
@@ -369,29 +376,8 @@ namespace TaskSchedulerForm
         // Zapisuje dane zadania do pliku JSON
         private void SaveTaskData()
         {
-            try
-            {
-                List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
-                string json = JsonSerializer.Serialize(taskInfos, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-
-                string jsonFileName = "taskData.json";
-                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
-
-                if (!FolderUtils.CanAccessFolder(selectedFolderPath))
-                {
-                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                File.WriteAllText(jsonFilePath, json);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Wyst¹pi³ nieznany problem z zapisem danych zadania: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            List<TaskInfo> taskInfos = taskControlsList.Select(tc => tc.TaskInfo).ToList();
+            _taskDAO.SaveTasks(taskInfos);
         }
 
 
@@ -399,85 +385,47 @@ namespace TaskSchedulerForm
         // £aduje dane zadañ z pliku JSON
         private void LoadTaskData()
         {
-            try
+            List<TaskInfo> taskInfos = _taskDAO.LoadTaskData(this.selectedFolderPath);
+
+            if (taskInfos != null && taskInfos.Count > 0)
             {
-                string jsonFileName = "taskData.json";
-                string jsonFilePath = Path.Combine(selectedFolderPath, jsonFileName);
-
-                //Sprawdza czy folder istnieje, je¿eli nie istnieje tworzy go.
-                if (!Directory.Exists(selectedFolderPath))
+                foreach (var taskInfo in taskInfos)
                 {
-                    Directory.CreateDirectory(selectedFolderPath);
-                }
+                    bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
 
-                // Sprawdza, czy wybrana œcie¿ka folderu jest dostêpna dla u¿ytkownika
-                if (!FolderUtils.CanAccessFolder(selectedFolderPath))
-                {
-                    MessageBox.Show("Brak uprawnieñ do zapisu w tym folderze. Uruchom aplikacjê z prawami administratora lub zmieñ folder zapisu.", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                //Je¿eli plik z zadaniami istnieje zczytuje dane
-                if (File.Exists(jsonFilePath))
-                {
-                    string json = File.ReadAllText(jsonFilePath);
-                    List<TaskInfo> taskInfos = JsonSerializer.Deserialize<List<TaskInfo>>(json);
-
-                    if (taskInfos != null)
+                    if (eventHasPassed && taskInfo.Type == TaskType.Daily)
                     {
-                        foreach (var taskInfo in taskInfos)
-                        {
-                            bool eventHasPassed = taskInfo.TargetDateTime <= DateTime.Now;
-
-                            // Dodatkowe sprawdzenie czy zadanie siê przedawni³o i jest typu Daily
-                            if (eventHasPassed && taskInfo.Type == TaskType.Daily)
-                            {
-                                eventHasPassed = false;
-
-                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                            }
-                            else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
-                            {
-                                eventHasPassed = false;
-
-                                DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
-                            }
-                            else
-                            {
-                                AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
-                            }
-
-                        }
+                        eventHasPassed = false;
+                        DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(1);
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                    }
+                    else if (eventHasPassed && taskInfo.Type == TaskType.Weekly)
+                    {
+                        eventHasPassed = false;
+                        DateTime newScheduledTime = taskInfo.TargetDateTime.AddDays(7);
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, newScheduledTime, eventHasPassed, taskInfo.Type);
+                    }
+                    else
+                    {
+                        AddTask(taskInfo.EventName, taskInfo.TargetApplication, taskInfo.TargetDateTime, eventHasPassed, taskInfo.Type);
                     }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Wyst¹pi³ problem ze wczytaniem danych zadania: {ex.Message}", "B³¹d", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
         }
 
         // £aduje konfiguracjê/preferencje u¿ytkowników
-        private void LoadConfiguration()
+        private void LoadConfiguration(AppConfiguration config)
         {
             try
             {
-                string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HarmonogramMK");
-                string configFilePath = Path.Combine(appDataFolder, "config.json");
-
-                //Je¿eli plik z konfiguracj¹ istnieje zczytuje dane
-                if (File.Exists(configFilePath))
+                if (config.SelectedFolderPath != null)
                 {
-                    string json = File.ReadAllText(configFilePath);
-                    AppConfiguration config = JsonSerializer.Deserialize<AppConfiguration>(json);
-
-                    if (config.SelectedFolderPath != null)
-                    {
-                        selectedFolderPath = config.SelectedFolderPath;
-                        isAppStartChecked = config.IsAppStartChecked;
-                    }
+                    selectedFolderPath = config.SelectedFolderPath;
+                    isAppStartChecked = config.IsAppStartChecked;
                 }
             }
             catch (Exception ex)
@@ -490,7 +438,7 @@ namespace TaskSchedulerForm
         // Pokazuje modal z ustawieniami do wyboru/zmiany
         private void accessibilityBtn_Click(object sender, EventArgs e)
         {
-            AccessibilityForm accessibilityForm = new AccessibilityForm(this);
+            AccessibilityForm accessibilityForm = new AccessibilityForm(this, this._configManager);
             accessibilityForm.ShowDialog();
         }
 

@@ -9,6 +9,7 @@ namespace TaskSchedulerForm
 {
     internal class StartupManager
     {
+        //Tworzy skrót aplikacji w folderze startup
         public static void CreateShortcutInStartup()
         {
             string startupFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
@@ -36,6 +37,7 @@ namespace TaskSchedulerForm
             }
         }
 
+        //Tworzy skrót aplikacji z folderu startup
         public static void RemoveShortcutFromStartup()
         {
             try
