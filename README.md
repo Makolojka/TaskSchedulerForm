@@ -61,6 +61,7 @@ Co można by dodać:
 - nowe typy zdarzeń, póki co aplikacja pozwala jedynie na otwarcie programu/procesu w określonym czasie. Można by dodać nowe typy zdarzeń/wyzwalaczy np. wysłanie wiadomości.
 - zastosować bazę danych oraz języka SQL do obsługi zapisu i odczytu danych zadań, co mogłoby zapewnić lepszą spójność, ochronę i zarządzanie. Póki co realizowane jest to w bardzo prymitywny sposób zapisu danych do pliku JSON, działającego jak prosta nierelacyjna, pseudo baza danych.
 - osobne okna aplikacji dla każdej funkcjonalności tj. tworzenie nowych zadań, podgląd aktywnych zadań. Jedynie zmiana opcji aplikacji działa w ten sposób, chociaż jest to modal, lepszym rozwiązaniem byłoby zastosowanie user control, a więc osobnych okien aplikacji które zmieniałby jedynie zawartość/widok aplikacji, a nie powodowałby wyświetlanie kolejnych okien. Zwiększyłoby to czytelność i wygodę użytkowania.
+- edycja zadań
 
 Co należałoby poprawić:
 - zmienić model aplikacji na taki używający user control, co zwiększyłoby re-używalność poszczególnych komponentów, można by podzielić aplikację na osobne okna(user control), które jasno i czytelnie segregowałby różne funkcjonalności. Np. rozdzielić okna tworzenia nowego zdania oraz aktywnych zadań.
